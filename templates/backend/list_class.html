@@ -1,0 +1,44 @@
+{% extends 'backend/base.html' %}
+{% block content %}
+    <!-- Content Wrapper.-->
+        <div class="content-wrapper">
+            <!-- Main content -->
+            <section class="content container-fluid">
+                <div class="box box-primary">
+                    <!-- form start -->
+                    <h1 class="box-title">Class List</h1>
+                    <div class="box">
+                        <div class="box-body">
+                            <table id="example1" class="table table-bordered table-striped text-center">
+                                <thead>
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Class</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                {% for cl in cls %}
+                                <tbody>
+                                    <tr>
+                                        <td>{{cl.id}}</td>
+                                        <td>{{cl.name}}</td>
+                                        <td>{{cl.updated_at}}</td>
+                                        <td>
+                                            <a href="{% url 'edit_class' cl.id %}" class="btn btn-info  fa fa-pencil"></a>
+                                            <a href="{% url 'delete_class' cl.id %}" class="btn btn-danger  fa fa-trash" onclick="return confirm('Are you sure?');"></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+    <!-- /.content-wrapper -->
+{% endblock %}
