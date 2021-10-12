@@ -1,0 +1,37 @@
+{% extends 'backend/base.html' %}
+{% block content %}
+    
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+                <!-- Main content -->
+                <section class="content container-fluid">
+                    <div class="box box-primary">
+                        <!-- form start -->
+                        <h1 class="box-title">Edit Class</h1>
+                        <form action="{% url 'edit_class' cls_edit.id %}" method="POST" role="form" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="container">
+                                <div class="box-body">
+                                    <div class="form-group">
+                                        <div class="col-md-3">
+                                            <label for="name" class="text-primary">Class</label>
+                                        </div>
+                                        <div class="col-md-7">
+                                            <input class="form-control" required="required" name="name" type="text" value="{{cls_edit.name}}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.box-body -->
+                                <div class="form-group text-center">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary">Update</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+                <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+{% endblock %}

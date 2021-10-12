@@ -1,0 +1,91 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">CHIDDIK</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+    </ul>
+      <button class="btn btn-outline-success mx-1" data-toggle="modal" data-target="#signup">Register</button>
+      <button class="btn btn-outline-success mx-1" data-toggle="modal" data-target="#login">Login</button>
+      <button type="submit" class="btn btn-outline-success mx-1" >Logout</button>
+  </div>
+
+    <!-- signup Modal -->
+  <div class="modal fade" id="signup" tabindex="-1" role="dialog" aria-labelledby="signup" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="signup">SignUp</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="" method="POST">
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Username" name="username">
+              </div>
+              <div class="form-group col-md-12">
+                <label for="fname">First Name</label>
+                <input type="text" class="form-control" id="fname" placeholder="First Name" name="fname">
+              </div>
+              <div class="form-group col-md-12">
+                <label for="lname">Last Name</label>
+                <input type="text" class="form-control" id="lname" placeholder="Last name" name="lname">
+              </div>
+              <div class="form-group col-md-12">
+                <label for="Pass1">Password</label>
+                <input type="password" class="form-control" id="Pass1" placeholder="Password">
+              </div>
+              <div class="form-group col-md-12">
+                <label for="Pass2">Confirm Password</label>
+                <input type="password" class="form-control" id="Pass2" placeholder="Confirm Password">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">SignUp</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login modal-->
+  <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="login" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="login">Login</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Username" name="username">
+              </div>
+              <div class="form-group col-md-12">
+                <label for="Password">Password</label>
+                <input type="password" class="form-control" id="Password" placeholder="Password">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</nav>
