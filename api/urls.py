@@ -12,6 +12,7 @@ urlpatterns = [
     path('tutor_validate/', tutor.tutor_validate),
     path('tutor_register/', tutor.tutor_register),
     path('tutor_edit_details/', tutor.tutor_edit_details),
+    path('search_tutor/', tutor.search_tutor),
 
     path('student_details/', student.student_details),
     path('student_validate/', student.student_validate),
