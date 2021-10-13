@@ -156,7 +156,7 @@ def add_service_slots(request):
       return JsonResponse({'status': False, 'msg': 'Tutor not valid', 'error':'INVALID_TUTOR'}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def get_tutor_service(request):
+def get_tutor_services(request):
   with connection.cursor() as cursor:
     id = request.GET['id']
     count = cursor.execute("SELECT `services`.*, `class`.`name` AS `class`, `subject`.`name` AS `subject` FROM `services` INNER JOIN `class` ON `services`.`c_id` = `class`.`id` INNER JOIN `subject` ON `services`.`s_id` = `subject`.`id` WHERE `services`.`t_id`=%s AND `services`.`status`='active'",[id])
@@ -165,6 +165,53 @@ def get_tutor_service(request):
       return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data': row}, status=status.HTTP_200_OK)
     else:
       return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':[]}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_tutor_service(request):
+  with connection.cursor() as cursor:
+    try:
+      id = request.GET['id']
+      serviceId = request.GET['service_id']
+      
+      count = cursor.execute("SELECT `services`.*, `class`.`name` AS `class`, `subject`.`name` AS `subject` FROM `services` INNER JOIN `class` ON `services`.`c_id` = `class`.`id` INNER JOIN `subject` ON `services`.`s_id` = `subject`.`id` WHERE `services`.`t_id`=%s AND `services`.`id`=%s AND `services`.`status`='active'",[id,serviceId])
+
+      row = dictfetchAll(cursor)
+      if(len(row)>=1):
+        data = row[0]
+        return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data': data}, status=status.HTTP_200_OK)
+      else:
+        return JsonResponse({'status': False, 'msg': 'Fetched Successfully','data':[]}, status=status.HTTP_200_OK)
+    except Exception as e:
+      return JsonResponse({'status': False, 'msg': 'Error fetching data', 'error':f'{e}'}, status=status.HTTP_200_OK)
+    finally:
+      cursor.close()
+
+@api_view(['GET'])
+def get_service_schedule(request):
+  with connection.cursor() as cursor:
+    try:
+      id = request.GET['t_id']
+      serviceId = request.GET['service_id']
+      
+      cursor.execute("SELECT `schedule`.*, `day`.`day` as `day_name` FROM `schedule` LEFT JOIN `day` ON `schedule`.`day_id`=`day`.`id` WHERE `schedule`.`service_id`=%s AND `schedule`.`status`='active'",[serviceId])
+      schedule = dictfetchAll(cursor)
+      if len(schedule)>0:
+        result = []
+        for day in schedule:
+          res = day
+          # print(day['id'])
+          cursor.execute("SELECT * FROM `slots` WHERE `t_id`=%s and `service_id`=%s and `schedule_id`=%s and `status`='active'",[id,serviceId,day['id']])
+          slots = dictfetchAll(cursor)
+          # print(slots)
+          res['slots']=slots
+          result.append(res)
+        return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data': result}, status=status.HTTP_200_OK)
+      else:
+        return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':[]}, status=status.HTTP_200_OK)
+    except Exception as e:
+      return JsonResponse({'status': False, 'msg': 'Error fetching data', 'error':f'{e}'}, status=status.HTTP_200_OK)
+    finally:
+      cursor.close()
 
 @api_view(['POST'])
 def add_tutor_slot(request):
@@ -288,7 +335,6 @@ def check_valid_service(tutorId, serviceId):
       return True
     else:
       return False
-
 
 def check_slot(tutorId, dayId, newStartTime, newEndTime, slotId=0):
   with connection.cursor() as cursor:
