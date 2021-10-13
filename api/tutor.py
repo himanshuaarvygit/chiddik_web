@@ -122,6 +122,35 @@ def handle_uploaded_file(file, path):
     for chunk in file.chunks():
         destination.write(chunk)
     destination.close()
+
+@api_view(['POST'])
+def search_tutor(request):
+  with connection.cursor() as cursor:
+    name = request.POST.get('name', '')
+    location = request.POST.get('location','')
+    c_id = request.POST.get('c_id','')
+    s_id = request.POST.get('s_id','')
+    # clas_type = request.POST['class_type']
+    # min_price = request.POST['min_price']
+    # max_price = request.POST['max_price']
+
+    
+    # count = cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE name=%s ORDER BY RAND() limit 20 offset 0 ", [name])
+    if name:
+      cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE name=%s ORDER BY RAND() LIMIT 20 OFFSET 0 ", [name])
+      row = dictfetchAll(cursor)
+      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
+    elif location: 
+      cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE location=%s ORDER BY RAND() limit 20 offset 0 ", [location])
+      row = dictfetchAll(cursor)
+      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
+    elif c_id and s_id: 
+      cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE c_id=%s and s_id=%s ORDER BY RAND() limit 20 offset 0 ", [c_id,s_id])
+      row = dictfetchAll(cursor)
+      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
+    else:
+      return JsonResponse({'status': False, 'msg': 'Fetched not Successfully'}, status=status.HTTP_200_OK)
+      
       
 def check_valid_tutor(tutorId):
   with connection.cursor() as cursor:

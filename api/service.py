@@ -372,22 +372,3 @@ def check_slot(tutorId, dayId, newStartTime, newEndTime, slotId=0):
       return True
 
     
-
-
-# def my_function(type_personal):
-#   if(type_personal == 'yes'):
-#     result = "yes"
-    
-#     print(result)
-# my_function()
-
-# def tutor_id_valid(t_id):
-#   with connection.cursor() as cursor:
-#     t_id = request.POST['t_id']
-
-#     count = cursor.execute("SELECT * FROM `tutor` WHERE id = %s", [t_id])
-#     if(count>0):
-#       return JsonResponse({'status': True, 'msg': 'Tutor valid'}, status=status.HTTP_200_OK)
-#     else:
-#       return JsonResponse({'status': False, 'msg': 'Tutor not valid', 'error':'INVALID_TUTOR'}, status=status.HTTP_200_OK)
-
