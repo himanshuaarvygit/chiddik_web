@@ -123,3 +123,11 @@ def handle_uploaded_file(file, path):
         destination.write(chunk)
     destination.close()
       
+def check_valid_tutor(tutorId):
+  with connection.cursor() as cursor:
+    cursor.execute("SELECT * FROM `tutor` where id =%s", [tutorId])
+    row = dictfetchAll(cursor)
+    if(len(row)>0):
+      return True
+    else:
+      return False
