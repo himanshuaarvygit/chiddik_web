@@ -152,3 +152,11 @@ def search_tutor(request):
       return JsonResponse({'status': False, 'msg': 'Fetched not Successfully'}, status=status.HTTP_200_OK)
       
       
+def check_valid_tutor(tutorId):
+  with connection.cursor() as cursor:
+    cursor.execute("SELECT * FROM `tutor` where id =%s", [tutorId])
+    row = dictfetchAll(cursor)
+    if(len(row)>0):
+      return True
+    else:
+      return False
