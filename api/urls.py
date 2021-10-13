@@ -20,7 +20,9 @@ urlpatterns = [
 
     path('add_tutor_service/', service.add_tutor_service),
     path('add_service_slots/', service.add_service_slots),
+    path('get_tutor_services/', service.get_tutor_services),
     path('get_tutor_service/', service.get_tutor_service),
+    path('get_service_schedule/', service.get_service_schedule),
     path('add_tutor_slot/', service.add_tutor_slot),
     path('check_slot/', service.check_slot),
     path('edit_tutor_slot/', service.edit_tutor_slot),
