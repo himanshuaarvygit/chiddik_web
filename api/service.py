@@ -25,9 +25,10 @@ def add_tutor_service(request):
         personal_price = request.POST['personal_price']
         group_price = request.POST['group_price']
         
-        count = cursor.execute("SELECT * FROM `tutor` WHERE id = %s", [t_id])
-        if(count>0):
-          if(c_id == '0'):
+        if not check_valid_tutor(t_id):
+          return JsonResponse({'status': False, 'msg': 'Tutor Not Valid.', 'error': 'INVALID_TUTOR'}, status=status.HTTP_200_OK)
+        
+        if(c_id == '0'):
             c_other = request.POST.get('c_other', '')
             s_other = request.POST.get('s_other', '')
 
@@ -63,17 +64,16 @@ def add_tutor_service(request):
               row = dictfetchAll(cursor)[0]
               return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
               
-          else:
+        else:
             if(s_id == '0'):
               is_cid_active = 1
               s_other = request.POST.get('s_other','')
               # print(f"s_other : {s_other}")
               if(s_other==''):
                 return JsonResponse({'status': True, 'msg': 'Other subject name not given','data':None}, status=status.HTTP_200_OK)
-              count = cursor.execute("INSERT INTO `subject_request`(t_id,c_id,name,is_cid_active) VALUES (%s,%s,%s,%s)",[t_id,c_id,s_other,int(is_cid_active)])
+              cursor.execute("INSERT INTO `subject_request`(t_id,c_id,name,is_cid_active) VALUES (%s,%s,%s,%s)",[t_id,c_id,s_other,int(is_cid_active)])
               sr_id = cursor.lastrowid
-
-              
+ 
               if(type_personal == 'yes' and type_group == 'yes'):
                 result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
                 if (result>0):
@@ -84,11 +84,14 @@ def add_tutor_service(request):
                 else:
                   return JsonResponse({'status': False, 'msg': 'Error Occurred! Please try again!','error': 'ERROR'}, status=status.HTTP_200_OK)    
               elif(type_personal == 'yes'):
-                cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
-                id = cursor.lastrowid
-                cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])
-                row = dictfetchAll(cursor)[0]
-                return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
+                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
+                if (result>0):
+                  id = cursor.lastrowid
+                  cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])
+                  row = dictfetchAll(cursor)[0]
+                  return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
+                else:
+                  return JsonResponse({'status': False, 'msg': 'Error Occurred! Please try again!','error': 'ERROR'}, status=status.HTTP_200_OK)          
               elif(type_group == 'yes'):
                 result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
                 if (result>0):
@@ -122,8 +125,7 @@ def add_tutor_service(request):
                 cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])
                 row = dictfetchAll(cursor)[0]
                 return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
-        else:
-          return JsonResponse({'status': False, 'msg': 'Tutor not valid', 'error':'INVALID_TUTOR'}, status=status.HTTP_200_OK)
+        
 
 @api_view(['POST'])
 def add_service_slots(request):
