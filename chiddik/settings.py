@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-#!8qdiilw$k)o3%ux9#u4^w+=49bgx)j)@i=vqhex7(9_@x@@g
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '192.168.0.193',
+    # '192.168.0.193',
 ]
 
 LOGIN_REDIRECT_URL = '/backend/profile/'
@@ -68,7 +68,7 @@ LOGOUT_REDIRECT_URL = '/backend/logout/'
 # Application definition
 
 INSTALLED_APPS = [
-    'tinymce',
+    # 'tinymce',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -121,7 +121,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         # 'NAME': BASE_DIR / 'db.sqlite3',
         # 'ENGINE': 'mysql.connector.django',
-        'NAME': 'chiddik1',
+        'NAME': 'chiddik',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',

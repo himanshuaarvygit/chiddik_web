@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.fields import AutoField, DateTimeField
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from tinymce.models import HTMLField
+# from tinymce.models import HTMLField
 
 
 # Create your models here.
