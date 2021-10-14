@@ -135,7 +135,7 @@ def search_tutor(request):
     # max_price = request.POST['max_price']
     print(name)
     print(s_id)
-    print(location)
+    print(c_id)
 
     
     # count = cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE name=%s ORDER BY RAND() limit 20 offset 0 ", [name])
