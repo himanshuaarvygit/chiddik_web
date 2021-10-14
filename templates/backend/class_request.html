@@ -19,17 +19,18 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                {% for cls_req in request %}
+                                {% for cls in request %}
                                 <tbody>
                                     <tr>
-                                        <td>{{cls_req.id}}</td>
-                                        <td>{{cls_req.name}}</td>
-                                        <td>{{cls_req.tutor}}</td>
-                                        <td>{{cls_req.status}}</td>
-                                        {% comment %} <td>
-                                            <a href="{% url 'edit_class' cls_req.id %}" class="btn btn-info  fa fa-pencil"></a>
-                                            <a href="{% url 'delete_class' cls_req.id %}" class="btn btn-danger  fa fa-trash" onclick="return confirm('Are you sure?');"></a>
-                                        </td> {% endcomment %}
+                                        <td>{{cls.id}}</td>
+                                        <td>{{cls.name}}</td>
+                                        <td>{{cls.tutor}}</td>
+                                        <td>{{cls.status}}</td>
+                                        <td>
+                                            <a href="{% url 'class_reject' cls.id %}" class="btn btn-warning">Approved</a>
+                                            <a href="#" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a>
+                                            {% comment %} <a href="{% url 'class_reject' cls_req.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a> {% endcomment %}
+                                        </td>
                                     </tr>
                                 </tbody>
                                 {% endfor %}

@@ -178,7 +178,27 @@ def class_request(request):
       row = dictfetchAll(cursor)
       return render(request,'backend/class_request.html',{'request':row})
 
-   
+@login_required
+def class_approved(request,id):
+   with connection.cursor() as cursor:
+      return redirect('list_subject')
+      
+
+@login_required
+def subject_request(request):
+   with connection.cursor() as cursor:
+      cursor.execute("SELECT subject_request.*,tutor.name AS tutor,class.name AS class FROM `subject_request` JOIN tutor ON subject_request.t_id=tutor.id JOIN class ON subject_request.c_id=class.id")
+      row = dictfetchAll(cursor)
+      return render(request,'backend/subject_request.html',{'request':row})
+
+# @login_required
+# def class_reject(request,id):
+#    with connection.cursor() as cursor:
+#       cursor.execute("DELETE from class where id=%s",(id))
+#       row = dictfetchAll (cursor)
+#       messages.success(request,"Delete successfully.")
+#       redirect('class_request')
+
 
 
 

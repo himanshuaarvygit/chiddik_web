@@ -69,7 +69,7 @@ def add_tutor_service(request):
               is_cid_active = 1
               s_other = request.POST.get('s_other','')
 
-              print(f"s_other : {s_other}")
+              # print(f"s_other : {s_other}")
               
               if(s_other==''):
                 return JsonResponse({'status': True, 'msg': 'Other subject name not given','data':None}, status=status.HTTP_200_OK)
