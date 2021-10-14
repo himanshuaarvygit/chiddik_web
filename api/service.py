@@ -190,7 +190,7 @@ def get_tutor_service(request):
 def get_service_schedule(request):
   with connection.cursor() as cursor:
     try:
-      id = request.GET['t_id']
+      id = request.GET['id']
       serviceId = request.GET['service_id']
       
       cursor.execute("SELECT `schedule`.*, `day`.`day` as `day_name` FROM `schedule` LEFT JOIN `day` ON `schedule`.`day_id`=`day`.`id` WHERE `schedule`.`service_id`=%s AND `schedule`.`status`='active'",[serviceId])
