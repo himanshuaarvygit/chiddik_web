@@ -1,0 +1,49 @@
+{% extends 'backend/base.html' %}
+{% block content %}
+    <!-- Content Wrapper.-->
+        <div class="content-wrapper">
+            <!-- Main content -->
+            <section class="content container-fluid">
+                <div class="box box-primary">
+                    <!-- form start -->
+                    <h1 class="box-title">Subject Request</h1>
+                    <div class="box">
+                        <div class="box-body">
+                            <table id="example1" class="table table-bordered table-striped text-center">
+                                <thead>
+                                    <tr>
+                                        <th>S.No</th>
+                                        <th>Subject Name</th>
+                                        <th>Class Name</th>
+                                        <th>Tutor Name</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                {% for sub in request %}
+                                <tbody>
+                                    <tr>
+                                        <td>{{sub.id}}</td>
+                                        <td>{{sub.name}}</td>
+                                        <td>{{sub.class}}</td>
+                                        <td>{{sub.tutor}}</td>
+                                        <td>{{sub.status}}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-warning">Approved</a>
+                                            <a href="#" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a>
+                                            {% comment %} <a href="{% url 'class_reject' cls_req.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a> {% endcomment %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                {% endfor %}
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+    <!-- /.content-wrapper -->
+{% endblock %}
