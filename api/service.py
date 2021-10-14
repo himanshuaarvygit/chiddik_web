@@ -68,7 +68,9 @@ def add_tutor_service(request):
             if(s_id == '0'):
               is_cid_active = 1
               s_other = request.POST.get('s_other','')
-              # print(f"s_other : {s_other}")
+
+              print(f"s_other : {s_other}")
+              
               if(s_other==''):
                 return JsonResponse({'status': True, 'msg': 'Other subject name not given','data':None}, status=status.HTTP_200_OK)
               cursor.execute("INSERT INTO `subject_request`(t_id,c_id,name,is_cid_active) VALUES (%s,%s,%s,%s)",[t_id,c_id,s_other,int(is_cid_active)])

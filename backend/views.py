@@ -6,6 +6,8 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from backend.models import Pages, Class, Subject
 from django.db import connection
+from .utility import dictfetchAll
+
 
 # Create your views here.
 
@@ -13,7 +15,7 @@ def showlogin(request):
    # if request.user!=None:
    #    return redirect('dashboard')
    # else:
-      return render(request,'backend/login.html')
+   return render(request,'backend/login.html')
 
 def login1(request):
    if request.method == "POST":
@@ -49,8 +51,7 @@ def terms_condition_tutor(request,id):
       term_t.save()
       messages.success(request,"Update successfully.")
       # return redirect('terms_condition_tutor')
-   context = {'terms':term_t}
-   return render(request,'backend/terms_condition_tutor.html',context)
+   return render(request,'backend/terms_condition_tutor.html',{'terms':term_t})
 
 @login_required
 def privacy_policy_tutor(request,id):
@@ -60,8 +61,7 @@ def privacy_policy_tutor(request,id):
       term_p.privacy_policy_tutor = request.POST['privacy_policy_tutor']
       term_p.save()
       messages.success(request,"Update successfully.")
-   context = {'terms':term_p}
-   return render(request,'backend/privacy_policy_tutor.html',context)
+   return render(request,'backend/privacy_policy_tutor.html',{'terms':term_p})
 
 @login_required
 def terms_condition_stud(request,id):
@@ -71,8 +71,7 @@ def terms_condition_stud(request,id):
       term_s.terms_condition_stud = request.POST['terms_condition_stud']
       term_s.save()
       messages.success(request,"Update successfully.")
-   context = {'terms':term_s}
-   return render(request,'backend/terms_condition_stud.html',context)
+   return render(request,'backend/terms_condition_stud.html',{'terms':term_s})
 
 @login_required
 def privacy_policy_stud(request,id):
@@ -81,9 +80,8 @@ def privacy_policy_stud(request,id):
    if request.method=='POST':
       term_sp.privacy_policy_stud = request.POST['privacy_policy_stud']
       term_sp.save()
-      messages.success(request,"Update successfully.")
-   context = {'terms':term_sp}
-   return render(request,'backend/privacy_policy_stud.html',context)
+      messages.success(request,"Update successfully.") 
+   return render(request,'backend/privacy_policy_stud.html',{'terms':term_sp})
 
 @login_required
 def about_us(request,id):
@@ -93,8 +91,7 @@ def about_us(request,id):
       about.about_us = request.POST['about_us']
       about.save()
       messages.success(request,"Update successfully.")
-   context = {'terms':about}
-   return render(request,'backend/about_us.html',context)
+   return render(request,'backend/about_us.html',{'terms':about})
 
 @login_required
 def add_class(request):
@@ -108,9 +105,10 @@ def add_class(request):
 
 @login_required
 def list_class(request):
-   cls_list= Class.objects.all()
-   context = {'cls':cls_list}
-   return render(request,'backend/list_class.html',context)
+   with connection.cursor() as cursor:
+      cursor.execute("SELECT * FROM `class`")
+      row = dictfetchAll(cursor)
+      return render(request,'backend/list_class.html',{'cls_list':row})
 
 @login_required
 def edit_class(request, id):
@@ -120,8 +118,7 @@ def edit_class(request, id):
       cls_edit.name = request.POST['name']
       cls_edit.save()
       messages.success(request,"Update successfully.")
-   context = {'cls_edit':cls_edit}
-   return render(request,'backend/edit_class.html',context)
+   return render(request,'backend/edit_class.html',{'cls_edit':cls_edit})
 
 @login_required
 def delete_class(request,id):
@@ -145,18 +142,10 @@ def add_subject(request):
 
 @login_required
 def list_subject(request):
-   cursor=connection.cursor()
-   # cursor.execute("call")
-   # SELECT * FROM (cname,sname FROM class INNER JOIN subject on class.id=subject.c_id)
-      # sub_list = Subject()
-      # inner('Class', 'Subject.cls_id', '=', 'Class.id')
-      # select('Subject.*', 'Class.cname as cname')
-      # orderBy('Subject.id', 'desc')
-      # get()
-
-   sub_list= Subject.objects.all()
-   context = {'sub_list':sub_list}
-   return render(request,'backend/list_subject.html',context)
+   with connection.cursor() as cursor:
+      cursor.execute("SELECT subject.*,class.name AS class FROM `subject` JOIN class ON subject.c_id=class.id")
+      row = dictfetchAll(cursor)
+      return render(request,'backend/list_subject.html',{'sub_list':row})
 
 @login_required
 def edit_subject(request, id):
@@ -181,6 +170,15 @@ def delete_subject(request,id):
    sub_delete.delete()
    messages.success(request,"Delete successfully.")
    return redirect('list_subject')
+
+@login_required
+def class_request(request):
+   with connection.cursor() as cursor:
+      cursor.execute("SELECT class_request.*,tutor.name AS tutor FROM `class_request` JOIN tutor ON class_request.t_id=tutor.id")
+      row = dictfetchAll(cursor)
+      return render(request,'backend/class_request.html',{'request':row})
+
+   
 
 
 
