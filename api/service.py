@@ -248,7 +248,7 @@ def add_tutor_slot(request):
       return JsonResponse({'status': False, 'msg': 'Slot not added.','data':[]}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def disable_tutor_slot(request):
+def remove_tutor_slot(request):
   with connection.cursor() as cursor:
     try:
       tutorId = request.POST['t_id']
@@ -257,7 +257,7 @@ def disable_tutor_slot(request):
       if not check_valid_tutor(tutorId):
         return JsonResponse({'status': False, 'msg': 'Tutor Not Valid.', 'error': 'INVALID_TUTOR'}, status=status.HTTP_200_OK)
       
-      result = cursor.execute("UPDATE `slots` SET status = 'disabled' WHERE `id`=%s AND `t_id`=%s", [slotId, tutorId])
+      result = cursor.execute("UPDATE `slots` SET status = 'inactive' WHERE `id`=%s AND `t_id`=%s", [slotId, tutorId])
       if(result > 0):
         return JsonResponse({'status': True, 'msg': 'Slot removed'}, status=status.HTTP_200_OK) 
       else:
@@ -305,6 +305,28 @@ def edit_tutor_slot(request):
       return JsonResponse({'status': False, 'msg': 'Slot not update here'}, status=status.HTTP_200_OK)
     finally:
       cursor.close() 
+
+@api_view(['POST'])
+def add_schedule(request):
+  with connection.cursor() as cursor:
+    try:
+      tutorId = request.POST['t_id']
+      serviceId = request.POST['service_id']
+      dayId = request.POST['day_id']
+
+      if not check_valid_tutor(tutorId):
+        return JsonResponse({'status': False, 'msg': 'Tutor Not Valid.', 'error': 'INVALID_TUTOR'}, status=status.HTTP_200_OK)
+      
+      addSchedule = cursor.execute("INSERT INTO `schedule`(day_id,service_id) VALUES (%s,%s)",[dayId, serviceId])
+      if addSchedule>0:
+        return JsonResponse({'status': True, 'msg':'Schedule added successfully'}, status=status.HTTP_200_OK)
+      else:
+        return JsonResponse({'status': False, 'msg':'Error added schedule'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+      return JsonResponse({'status': False, 'msg':'Error added schedule', 'error': f'{e}'}, status=status.HTTP_200_OK)
+    finally:
+      cursor.close()
 
 @api_view(['POST'])
 def remove_schedule(request):
