@@ -18,15 +18,15 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                {% for cl in cls %}
+                                {% for cls in cls_list %}
                                 <tbody>
                                     <tr>
-                                        <td>{{cl.id}}</td>
-                                        <td>{{cl.name}}</td>
-                                        <td>{{cl.updated_at}}</td>
+                                        <td>{{cls.id}}</td>
+                                        <td>{{cls.name}}</td>
+                                        <td>{{cls.updated_at}}</td>
                                         <td>
-                                            <a href="{% url 'edit_class' cl.id %}" class="btn btn-info  fa fa-pencil"></a>
-                                            <a href="{% url 'delete_class' cl.id %}" class="btn btn-danger  fa fa-trash" onclick="return confirm('Are you sure?');"></a>
+                                            <a href="{% url 'edit_class' cls.id %}" class="btn btn-info  fa fa-pencil"></a>
+                                            <a href="{% url 'delete_class' cls.id %}" class="btn btn-danger  fa fa-trash" onclick="return confirm('Are you sure?');"></a>
                                         </td>
                                     </tr>
                                 </tbody>

@@ -29,4 +29,8 @@ urlpatterns = [
     path('edit_subject/<int:id>/', views.edit_subject, name='edit_subject'),
     path('delete_subject/<int:id>/', views.delete_subject, name='delete_subject'),
 
+    path('class_request', views.class_request, name='class_request'),
+
+
+
 ]
