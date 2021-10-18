@@ -28,6 +28,7 @@ urlpatterns = [
     path('check_slot/', service.check_slot),
     path('edit_tutor_slot/', service.edit_tutor_slot),
     path('remove_tutor_slot/', service.remove_tutor_slot),
+    path('add_schedule/', service.add_schedule),
     path('remove_schedule/', service.remove_schedule),
 
     path('get_all_classes/', views.get_all_classes),
