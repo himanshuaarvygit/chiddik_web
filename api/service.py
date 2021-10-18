@@ -189,6 +189,38 @@ def get_tutor_service(request):
     finally:
       cursor.close()
 
+@api_view(['POST'])
+def update_service(request):
+  with connection.cursor() as cursor:
+    try:
+      tutorId = request.POST['t_id']
+      serviceId = request.POST['service_id']
+      type_personal = request.POST['type_personal']
+      type_group = request.POST['type_group']
+      personal_price = request.POST['personal_price']
+      group_price = request.POST['group_price']
+
+      if not check_valid_tutor(tutorId):
+        return JsonResponse({'status': False, 'msg': 'Tutor Not Valid.', 'error': 'INVALID_TUTOR'}, status=status.HTTP_200_OK)
+
+      if not check_valid_service(tutorId, serviceId):
+        return JsonResponse({'status': False, 'msg': 'Service Not Valid.', 'error': 'INVALID_SERVICE'}, status=status.HTTP_200_OK)
+      
+      sql = "UPDATE `services` SET `type_personal`=%s,`type_group`=%s,`personal_price`=%s,`group_price`=%s,`updated`=%s WHERE `id`=%s and `t_id`=%s"
+      sqlData = [type_personal, type_group, personal_price, group_price, serviceId, tutorId]
+
+      updateService = cursor.execute(sql, sqlData)
+
+      if updateService>0:
+        return JsonResponse({'status':True, 'msg': 'Updated Successfully'}, status = status.HTTP_200_OK)
+      else:
+        return JsonResponse({'status': False, 'msg': 'Error'}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+      return JsonResponse({'status': False, 'msg': 'Error'}, status=status.HTTP_200_OK)
+    finally:
+      cursor.close()
+
 @api_view(['GET'])
 def get_service_schedule(request):
   with connection.cursor() as cursor:
