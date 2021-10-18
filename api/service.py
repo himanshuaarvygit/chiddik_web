@@ -240,9 +240,9 @@ def add_tutor_slot(request):
     count = cursor.execute("INSERT INTO `slots`(t_id,service_id,schedule_id,start_time,duration,class_type, day_id) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,service_id,schedule_id,start_time,duration,class_type,day_id]) 
     if(count>0):
       id = cursor.lastrowid
-      cursor.execute("SELECT * FROM `slots` WHERE id = %s", [id])
-      row = dictfetchAll(cursor)
-      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data': row}, status=status.HTTP_200_OK)
+      # cursor.execute("SELECT * FROM `slots` WHERE id = %s", [id])
+      # row = dictfetchAll(cursor)
+      return JsonResponse({'status': True, 'msg': 'Fetched Successfully', 'slot_id': cursor.lastrowid}, status=status.HTTP_200_OK)
     else:
       return JsonResponse({'status': False, 'msg': 'Slot not added.','data':[]}, status=status.HTTP_200_OK)
       
