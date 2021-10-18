@@ -206,18 +206,19 @@ def update_service(request):
       if not check_valid_service(tutorId, serviceId):
         return JsonResponse({'status': False, 'msg': 'Service Not Valid.', 'error': 'INVALID_SERVICE'}, status=status.HTTP_200_OK)
       
+      now = datetime.now()
       sql = "UPDATE `services` SET `type_personal`=%s,`type_group`=%s,`personal_price`=%s,`group_price`=%s,`updated`=%s WHERE `id`=%s and `t_id`=%s"
-      sqlData = [type_personal, type_group, personal_price, group_price, serviceId, tutorId]
+      sqlData = [type_personal, type_group, personal_price, group_price, now, serviceId, tutorId]
 
       updateService = cursor.execute(sql, sqlData)
 
       if updateService>0:
         return JsonResponse({'status':True, 'msg': 'Updated Successfully'}, status = status.HTTP_200_OK)
       else:
-        return JsonResponse({'status': False, 'msg': 'Error'}, status=status.HTTP_200_OK)
+        return JsonResponse({'status': False, 'msg': 'Error occurred'}, status=status.HTTP_200_OK)
 
     except Exception as e:
-      return JsonResponse({'status': False, 'msg': 'Error'}, status=status.HTTP_200_OK)
+      return JsonResponse({'status': False, 'msg': f'{e}'}, status=status.HTTP_200_OK)
     finally:
       cursor.close()
 
