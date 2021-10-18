@@ -174,15 +174,39 @@ def delete_subject(request,id):
 @login_required
 def class_request(request):
    with connection.cursor() as cursor:
-      cursor.execute("SELECT class_request.*,tutor.name AS tutor FROM `class_request` JOIN tutor ON class_request.t_id=tutor.id")
-      row = dictfetchAll(cursor)
+      count = cursor.execute("SELECT class_request.*,tutor.name AS tutor FROM `class_request` JOIN tutor ON class_request.t_id=tutor.id")
+      if count>0:
+         row = dictfetchAll(cursor)
       return render(request,'backend/class_request.html',{'request':row})
 
 @login_required
 def class_approved(request,id):
    with connection.cursor() as cursor:
-      return redirect('list_subject')
+      if request.method=='POST':
+         id = request.POST['id']
+         count = cursor.execute("UPDATE `services` SET `c_status`='active' WHERE c_status='request' and id=%s",[id])
+         if count>0:
+            row = dictfetchAll(cursor)
+      return redirect('class_request')
+
       
+@login_required
+def class_reject(request,id):
+    with connection.cursor() as cursor:
+      cursor.execute("DELETE FROM `class_request` WHERE id=%s",[id])
+      messages.success(request,"Delete successfully.")
+      return redirect('class_request')
+
+   # try:
+	# 	cursor.execute("DELETE FROM class_request WHERE id =%s", [id])
+		
+	# 	messages.success(request,"Delete successfully.")
+	# 	return redirect('class_request')
+	# except Exception as e:
+	# 	print(e)
+	# finally:
+	# 	cursor.close() 
+	# 	conn.close()
 
 @login_required
 def subject_request(request):
@@ -191,13 +215,24 @@ def subject_request(request):
       row = dictfetchAll(cursor)
       return render(request,'backend/subject_request.html',{'request':row})
 
-# @login_required
-# def class_reject(request,id):
-#    with connection.cursor() as cursor:
-#       cursor.execute("DELETE from class where id=%s",(id))
-#       row = dictfetchAll (cursor)
-#       messages.success(request,"Delete successfully.")
-#       redirect('class_request')
+@login_required
+def subject_approved(request,t_id):
+   with connection.cursor() as cursor:
+      id = request.POST['id']
+      name = request.POST['name']
+
+      count = cursor.execute("UPDATE `services` SET `s_status`='active' WHERE id=%s and s_status='request'",[id])
+      if count>0:
+         s_id = cursor.lastrowid
+         cursor.execute("INSERT INTO `suject`(id,name) VALUES (%s,%s)",[s_id,name])
+      return redirect('class_request')
+
+@login_required
+def subject_reject(request,id):
+    with connection.cursor() as cursor:
+      cursor.execute("DELETE FROM `subject_request` WHERE id=%s",[id])
+      return redirect('subject_request')
+
 
 
 

@@ -127,8 +127,7 @@ def add_tutor_service(request):
                 cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])
                 row = dictfetchAll(cursor)[0]
                 return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
-        
-
+      
 @api_view(['POST'])
 def add_service_slots(request):
   with connection.cursor() as cursor:
@@ -246,7 +245,7 @@ def add_tutor_slot(request):
       return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data': row}, status=status.HTTP_200_OK)
     else:
       return JsonResponse({'status': False, 'msg': 'Slot not added.','data':[]}, status=status.HTTP_200_OK)
-
+      
 @api_view(['POST'])
 def remove_tutor_slot(request):
   with connection.cursor() as cursor:

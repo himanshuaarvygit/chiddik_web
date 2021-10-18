@@ -31,9 +31,13 @@ urlpatterns = [
 
     path('class_request', views.class_request, name='class_request'),
     path('class_approved/<int:id>/', views.class_approved, name='class_approved'),
+    path('class_reject/<int:id>/', views.class_reject, name='class_reject'),
 
     path('subject_request', views.subject_request, name='subject_request'),
-    # path('class_reject/<int:id>/', views.class_reject, name='class_reject'),
+    path('subject_approved/<int:id>/', views.subject_approved, name='subject_approved'),
+    path('subject_reject/<int:id>/', views.subject_reject, name='subject_reject'),
+
+    
 
 
 
