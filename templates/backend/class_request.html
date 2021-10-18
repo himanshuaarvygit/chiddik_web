@@ -27,9 +27,8 @@
                                         <td>{{cls.tutor}}</td>
                                         <td>{{cls.status}}</td>
                                         <td>
-                                            <a href="{% url 'class_reject' cls.id %}" class="btn btn-warning">Approved</a>
-                                            <a href="#" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a>
-                                            {% comment %} <a href="{% url 'class_reject' cls_req.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a> {% endcomment %}
+                                            <a href="{% url 'class_approved' cls.id %}" class="btn btn-warning">Approved</a>
+                                            <a href="{% url 'class_reject' cls.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a>
                                         </td>
                                     </tr>
                                 </tbody>

@@ -29,9 +29,8 @@
                                         <td>{{sub.tutor}}</td>
                                         <td>{{sub.status}}</td>
                                         <td>
-                                            <a href="#" class="btn btn-warning">Approved</a>
-                                            <a href="#" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a>
-                                            {% comment %} <a href="{% url 'class_reject' cls_req.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a> {% endcomment %}
+                                            <a href="{% url 'subject_approved' sub.id %}" class="btn btn-warning">Approved</a>
+                                            <a href="{% url 'subject_reject' sub.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?');">Reject</a>
                                         </td>
                                     </tr>
                                 </tbody>
