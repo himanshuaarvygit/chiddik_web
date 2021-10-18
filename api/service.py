@@ -316,9 +316,12 @@ def add_schedule(request):
       if not check_valid_tutor(tutorId):
         return JsonResponse({'status': False, 'msg': 'Tutor Not Valid.', 'error': 'INVALID_TUTOR'}, status=status.HTTP_200_OK)
       
+      if check_schedule(serviceId, dayId):
+        return JsonResponse({'status': False, 'msg': 'Schedule Already Available.', 'error': 'SCHEDULE_ALREADY_AVAILABLE'}, status=status.HTTP_200_OK)
+      
       addSchedule = cursor.execute("INSERT INTO `schedule`(day_id,service_id) VALUES (%s,%s)",[dayId, serviceId])
       if addSchedule>0:
-        return JsonResponse({'status': True, 'msg':'Schedule added successfully'}, status=status.HTTP_200_OK)
+        return JsonResponse({'status': True, 'msg':'Schedule added successfully', 'schedule_id': cursor.lastrowid}, status=status.HTTP_200_OK)
       else:
         return JsonResponse({'status': False, 'msg':'Error added schedule'}, status=status.HTTP_200_OK)
 
@@ -357,6 +360,20 @@ def check_valid_service(tutorId, serviceId):
     cursor.execute("SELECT * FROM `services` where id = %s AND t_id = %s AND status='active'", [serviceId, tutorId])
     row = dictfetchAll(cursor)
     if(len(row)>0):
+      return True
+    else:
+      return False
+
+def check_schedule(serviceId, dayId):
+  with connection.cursor() as cursor:
+    sql = ""
+    sqlData = []
+
+    sql = "SELECT * FROM `schedule` WHERE service_id = %s and day_id = %s and status='active'"
+    sqlData = [serviceId, dayId]
+
+    count = cursor.execute(sql, sqlData)
+    if (count>0):
       return True
     else:
       return False
