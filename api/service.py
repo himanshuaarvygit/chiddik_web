@@ -77,7 +77,7 @@ def add_tutor_service(request):
               sr_id = cursor.lastrowid
  
               if(type_personal == 'yes' and type_group == 'yes'):
-                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
+                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price,c_status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price,'active'])
                 if (result>0):
                   id = cursor.lastrowid
                   cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])
@@ -86,7 +86,7 @@ def add_tutor_service(request):
                 else:
                   return JsonResponse({'status': False, 'msg': 'Error Occurred! Please try again!','error': 'ERROR'}, status=status.HTTP_200_OK)    
               elif(type_personal == 'yes'):
-                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
+                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price,c_status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price,'active'])
                 if (result>0):
                   id = cursor.lastrowid
                   cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])
@@ -95,7 +95,7 @@ def add_tutor_service(request):
                 else:
                   return JsonResponse({'status': False, 'msg': 'Error Occurred! Please try again!','error': 'ERROR'}, status=status.HTTP_200_OK)          
               elif(type_group == 'yes'):
-                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price) VALUES (%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price])
+                result = cursor.execute("INSERT INTO `services`(t_id,c_id,s_id,type_personal,type_group,personal_price,group_price,c_status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",[t_id,c_id,sr_id,type_personal,type_group,personal_price,group_price,'active'])
                 if (result>0):
                   id = cursor.lastrowid
                   cursor.execute("SELECT * FROM `services` WHERE id = %s", [id])

@@ -14,7 +14,8 @@ from rest_framework.decorators import api_view
 
 @api_view(['POST'])
 def tutor_details(request):
-      with connection.cursor() as cursor:
+    with connection.cursor() as cursor:
+      try:
         id = request.POST['id']
         # cursor.execute('CREATE TEMPORARY TABLE `temp_tutor` AS SELECT * FROM `tutor`;')
         # cursor.execute('ALTER TABLE `temp_tutor` DROP COLUMN `coordinates`;')
@@ -32,6 +33,12 @@ def tutor_details(request):
           return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
         else:
           return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
+      except Exception as e:
+        print(e)
+        return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','error':e}, status=status.HTTP_200_OK)
+      finally:
+        cursor.close()
+        
 
 @api_view(['POST'])
 def tutor_validate(request):
@@ -43,7 +50,7 @@ def tutor_validate(request):
             row.pop('coordinates')
             return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row,'valid':1}, status=status.HTTP_200_OK)   
          else:
-            return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','valid':0}, status=status.HTTP_200_OK)
+            return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','valid':0}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def tutor_register(request):
