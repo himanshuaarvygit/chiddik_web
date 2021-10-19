@@ -31,7 +31,7 @@ def tutor_details(request):
           print(row)
           return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
         else:
-          return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
+          return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def tutor_validate(request):
@@ -99,22 +99,25 @@ def tutor_edit_details(request):
       bio =request.POST['bio']
       video_link = request.POST['video_link']
 
+      lat = float(lat_tb)
+      lon = float(long_tb)
+
       if pic != '':
         profile_pic = f'media/tutor/{pic.name}'
         handle_uploaded_file(pic, profile_pic)	
 
         sqlQuery = "UPDATE tutor SET name=%s,location=%s,pic=%s,bio=%s,video_link=%s,coordinates=ST_GeomFromText('POINT(%s %s)') WHERE id=%s"
         # print(name)
-        data = (name, location, profile_pic,bio,video_link,lat_tb, long_tb, id)
+        data = (name, location, profile_pic,bio,video_link,lat, lon, id)
         result = cursor.execute(sqlQuery, data)
         if (result>0):
           cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` where id =%s", [id])
           row = dictfetchAll (cursor)[0]
           row.pop('coordinates')
           return JsonResponse({'status': True, 'msg': 'Updated Successfully','data':row}, status=status.HTTP_200_OK)   
-      elif name and location and long_tb and lat_tb and bio and video_link and  id:
+      elif name and location and lon and lat and bio and video_link and  id:
         sqlQuery = "UPDATE tutor SET name=%s,location=%s,bio=%s,video_link=%s,coordinates=ST_GeomFromText('POINT(%s %s)') WHERE id=%s"
-        data = (name, location, bio,video_link,lat_tb, long_tb, id)
+        data = (name, location, bio,video_link,lat, lon, id)
         result = cursor.execute(sqlQuery, data)
         if (result>0):
           cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` where id =%s", [id])
