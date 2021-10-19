@@ -16,23 +16,31 @@ from rest_framework.decorators import api_view
 def tutor_details(request):
       with connection.cursor() as cursor:
         id = request.POST['id']
+        # cursor.execute('CREATE TEMPORARY TABLE `temp_tutor` AS SELECT * FROM `tutor`;')
+        # cursor.execute('ALTER TABLE `temp_tutor` DROP COLUMN `coordinates`;')
+        # cursor.execute('SELECT * FROM temp_sale_details; ')
 
-        count = cursor.execute("SELECT * FROM `tutor` WHERE id = %s", [id])
+        # `id`, `name`, `email`, `phone`, `id_proof`, `education_cer`, `location`, `pic`, `status`, `video_link`, `bio`, `wallet`
+        sql = "SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE id = %s"
+        count = cursor.execute(sql, [id])
         # row = cursor.fetchone()
         # log.debug(dictfetchall(cursor))
         if (count>0):
-            row = dictfetchAll(cursor)[0] 
-            return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
+          row = dictfetchAll(cursor)[0]
+          row.pop('coordinates') 
+          print(row)
+          return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
         else:
-            return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
+          return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def tutor_validate(request):
       with connection.cursor() as cursor:
          phone = request.POST['phone']
-         count = cursor.execute("SELECT * FROM `tutor` WHERE phone = %s", [phone])
+         count = cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE phone = %s", [phone])
          if (count>0):
             row = dictfetchAll(cursor)[0] 
+            row.pop('coordinates')
             return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row,'valid':1}, status=status.HTTP_200_OK)   
          else:
             return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','valid':0}, status=status.HTTP_200_OK)
@@ -51,7 +59,7 @@ def tutor_register(request):
 
         count = cursor.execute("SELECT * FROM `tutor` WHERE phone = %s", [phone])
         if(count>0):
-          row = dictfetchAll(cursor)[0] 
+          # row = dictfetchAll(cursor)[0] 
           return JsonResponse({'status': True, 'msg': 'User already exists'}, status=status.HTTP_200_OK)   
         else:
           edu_cert_name = f'media/tutor_certificate/edu_cert/{education_cer.name}'
@@ -60,11 +68,12 @@ def tutor_register(request):
           id_proof_name = f'media/tutor_certificate/id_proof/{id_proof.name}'
           handle_uploaded_file(id_proof, id_proof_name) 
 
-          result = cursor.execute ("INSERT INTO `tutor`(name, email, phone, location, long_tb, lat_tb, education_cer,id_proof) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",[name,email,phone,location,long_tb,lat_tb,edu_cert_name,id_proof_name])
+          result = cursor.execute ("INSERT INTO `tutor`(name, email, phone, location, education_cer, id_proof, coordinates) VALUES (%s,%s,%s,%s,%s,%s, ST_GeomFromText('POINT(%s %s)'))",[name,email,phone,location,edu_cert_name,id_proof_name,lat_tb,long_tb])
           if (result>0):
-            cursor.execute("SELECT * FROM `tutor` WHERE phone = %s", [phone])
+            cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE phone = %s", [phone])
             row = dictfetchAll (cursor)[0]
-            return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
+            row.pop('coordinates')
+            return JsonResponse({'status': True, 'msg': 'Registered Successfully','data':row}, status=status.HTTP_200_OK)   
           else:
             return JsonResponse({'status': True, 'msg': 'User not register'}, status=status.HTTP_200_OK)
 
@@ -93,21 +102,23 @@ def tutor_edit_details(request):
         profile_pic = f'media/tutor/{pic.name}'
         handle_uploaded_file(pic, profile_pic)	
 
-        sqlQuery = "UPDATE tutor SET name=%s,location=%s,long_tb=%s,lat_tb=%s,pic=%s,bio=%s,video_link=%s WHERE id=%s"
+        sqlQuery = "UPDATE tutor SET name=%s,location=%s,pic=%s,bio=%s,video_link=%s,coordinates=ST_GeomFromText('POINT(%s %s)') WHERE id=%s"
         # print(name)
-        data = (name, location, long_tb, lat_tb,profile_pic,bio,video_link, id)
+        data = (name, location, profile_pic,bio,video_link,lat_tb, long_tb, id)
         result = cursor.execute(sqlQuery, data)
         if (result>0):
-          cursor.execute("SELECT * FROM `tutor` where id =%s", [id])
+          cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` where id =%s", [id])
           row = dictfetchAll (cursor)[0]
+          row.pop('coordinates')
           return JsonResponse({'status': True, 'msg': 'Updated Successfully','data':row}, status=status.HTTP_200_OK)   
       elif name and location and long_tb and lat_tb and bio and video_link and  id:
-        sqlQuery = "UPDATE tutor SET name=%s,location=%s,long_tb=%s,lat_tb=%s,bio=%s,video_link=%s WHERE id=%s"
-        data = (name, location, long_tb, lat_tb,bio,video_link, id)
+        sqlQuery = "UPDATE tutor SET name=%s,location=%s,bio=%s,video_link=%s,coordinates=ST_GeomFromText('POINT(%s %s)') WHERE id=%s"
+        data = (name, location, bio,video_link,lat_tb, long_tb, id)
         result = cursor.execute(sqlQuery, data)
         if (result>0):
-          cursor.execute("SELECT * FROM `tutor` where id =%s", [id])
+          cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` where id =%s", [id])
           row = dictfetchAll (cursor)[0]
+          row.pop('coordinates')
           return JsonResponse({'status': True, 'msg': 'Updated Successfully','data':row}, status=status.HTTP_200_OK)   
       else:
         return JsonResponse({'status': False, 'msg': 'Tutor not update'}, status=status.HTTP_200_OK)
@@ -117,42 +128,117 @@ def tutor_edit_details(request):
     finally:
       cursor.close() 
 
-def handle_uploaded_file(file, path):
-    destination = open(path, 'wb+')
-    for chunk in file.chunks():
-        destination.write(chunk)
-    destination.close()
 
 @api_view(['POST'])
 def search_tutor(request):
   with connection.cursor() as cursor:
     name = request.POST.get('name', '')
-    location = request.POST.get('location','')
+    lat = request.POST.get('lat','')
+    lon = request.POST.get('lon','')
     c_id = request.POST.get('c_id','')
     s_id = request.POST.get('s_id','')
-    # clas_type = request.POST['class_type']
-    # min_price = request.POST['min_price']
-    # max_price = request.POST['max_price']
-    print(name)
-    print(s_id)
-    print(c_id)
+    class_type = request.POST.get('class_type','')
+    min_price = request.POST.get('min_price','')
+    max_price = request.POST.get('max_price','')
+    page = request.POST.get('page','0')
 
+    tutorResult = []
+    pageCount = int(page)*20
     
-    # count = cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE name=%s ORDER BY RAND() limit 20 offset 0 ", [name])
-    if name:
-      cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE name=%s ORDER BY RAND() LIMIT 20 OFFSET 0 ", [name])
-      row = dictfetchAll(cursor)
-      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
-    elif location: 
-      cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE location=%s ORDER BY RAND() limit 20 offset 0 ", [location])
-      row = dictfetchAll(cursor)
-      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
-    elif c_id and s_id: 
-      cursor.execute("SELECT tutor.*,services.c_id,services.s_id FROM `tutor` JOIN services ON services.t_id=tutor.id WHERE c_id=%s and s_id=%s ORDER BY RAND() limit 20 offset 0 ", [c_id,s_id])
-      row = dictfetchAll(cursor)
-      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)
+    sql = ""
+    nameQuery = ""
+    classSubjectQuery = ""
+    classTypeQuery = ""
+    
+
+    if name=='' and lat =='' and lon =='' and class_type=='' and c_id=='' and s_id=='' and min_price =='' and max_price =='':
+      sql = f"SELECT DISTINCT(`id`) FROM `tutor` WHERE `status`='active' ORDER BY `id` DESC LIMIT {pageCount}, 20"
     else:
-      return JsonResponse({'status': False, 'msg': 'Fetched not Successfully'}, status=status.HTTP_200_OK)
+      if name!='':
+        nameQuery = f"AND `tutor`.`name` LIKE '%{name}%'"
+      
+      if class_type=='group':
+        if min_price !='' and max_price !='':
+          classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
+        else:
+          classTypeQuery = f"AND (`services`.`type_group` = 'yes')"
+      elif class_type=='personal':
+        if min_price !='' and max_price !='':
+          classTypeQuery = f"AND (`services`.`type_personal` = 'yes' AND `services`.`personal_price` >= {min_price} AND `services`.`personal_price` <= {max_price})"
+        else:
+          classTypeQuery = f"AND (`services`.`type_personal` = 'yes')"
+      else:
+        if min_price !='' and max_price !='':
+          classTypeQuery = f"AND (`services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
+
+      if c_id !='':
+        if s_id !='':
+          classSubjectQuery = f"AND services`.`c_id` = {c_id} AND `services`.`s_id` = {s_id}"
+        else:
+          classSubjectQuery = f"AND services`.`c_id` = {c_id}"
+      
+      
+      
+      if lat !='' and lon !='':
+        #all query with lat lon
+        sql = f"""
+          SELECT 
+              DISTINCT(tutor.id),
+              (6371 * ACOS(COS(RADIANS({lat})) * COS(RADIANS(Y(coordinates))) 
+              * COS(RADIANS(X(coordinates)) - RADIANS({lon})) + SIN(RADIANS({lat}))
+              * SIN(RADIANS(Y(coordinates))))) AS distance
+          FROM `tutor`
+          LEFT JOIN `services` ON `tutor`.`id` = `services`.`t_id`
+          WHERE MBRContains (
+              LineString (
+                  Point (
+                      {lon} + 15 / (111.320 * COS(RADIANS({lat}))),
+                      {lat} + 15 / 111.133
+                  ),
+                  Point (
+                      {lon} - 15 / (111.320 * COS(RADIANS({lat}))),
+                      {lat} - 15 / 111.133
+                  )
+              ),
+              coordinates
+              )
+              AND `services`.`status` = 'active'
+              {nameQuery}
+              {classSubjectQuery}
+              {classTypeQuery}
+          HAVING distance < 15
+          ORDER By distance
+          LIMIT {pageCount}, 20
+        """
+      else:
+        #all queries without lat lon
+        sql = f"""
+          SELECT 
+              DISTINCT(tutor.id)
+          FROM `tutor`
+          LEFT JOIN `services` ON `tutor`.`id` = `services`.`t_id`
+          WHERE 
+              `services`.`status` = 'active'
+              {nameQuery}
+              {classSubjectQuery}
+              {classTypeQuery}
+          ORDER BY `id` DESC
+          LIMIT {pageCount}, 20
+        """
+
+    print(sql)
+    cursor.execute(sql)
+    result = dictfetchAll(cursor)
+    for t in result:
+      id = t['id']
+      cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE `id`=%s", [id])
+      tRes = dictfetchAll(cursor)
+      if len(tRes) != 0:
+        data = tRes[0]
+        data.pop('coordinates')
+        tutorResult.append(data)
+
+    return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':tutorResult}, status=status.HTTP_200_OK)
       
       
 def check_valid_tutor(tutorId):
