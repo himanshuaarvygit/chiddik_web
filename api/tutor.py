@@ -67,8 +67,9 @@ def tutor_register(request):
           
           id_proof_name = f'media/tutor_certificate/id_proof/{id_proof.name}'
           handle_uploaded_file(id_proof, id_proof_name) 
-
-          result = cursor.execute ("INSERT INTO `tutor`(name, email, phone, location, education_cer, id_proof, coordinates) VALUES (%s,%s,%s,%s,%s,%s, ST_GeomFromText('POINT(%s %s)'))",[name,email,phone,location,edu_cert_name,id_proof_name,lat_tb,long_tb])
+          lat = float(lat_tb)
+          lon = float(long_tb)
+          result = cursor.execute ("INSERT INTO `tutor`(name, email, phone, location, education_cer, id_proof, coordinates) VALUES (%s,%s,%s,%s,%s,%s, ST_GeomFromText('POINT(%s %s)'))",[name,email,phone,location,edu_cert_name,id_proof_name,lat,lon])
           if (result>0):
             cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE phone = %s", [phone])
             row = dictfetchAll (cursor)[0]
