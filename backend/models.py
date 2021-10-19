@@ -67,10 +67,14 @@ class Pages(models.Model):
         managed = False
         db_table = 'pages'
 
+STATUS = (
+       ('active', 'active'),
+       ('inactive', 'inactive'),
+   )
 class Class(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.TextField()
-    status = models.TextField()
+    status = models.TextField(max_length=50,choices=STATUS,default='active')
     created_at = models.DateField()
     updated_at = models.DateField(blank=True, null=True)
 
@@ -78,11 +82,15 @@ class Class(models.Model):
         managed = False
         db_table = 'class'
 
+STATUS = (
+       ('active', 'active'),
+       ('inactive', 'inactive'),
+   )
 class Subject(models.Model):
     id = models.IntegerField(primary_key=True)
     c_id = models.TextField()
     name = models.TextField()
-    status = models.TextField()
+    status = models.TextField(max_length=50,choices=STATUS,default='active')
     created_at = models.DateField()
     updated_at = models.DateField(blank=True, null=True)
 
