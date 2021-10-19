@@ -15,23 +15,30 @@ from rest_framework.decorators import api_view
 @api_view(['POST'])
 def tutor_details(request):
       with connection.cursor() as cursor:
-        id = request.POST['id']
-        # cursor.execute('CREATE TEMPORARY TABLE `temp_tutor` AS SELECT * FROM `tutor`;')
-        # cursor.execute('ALTER TABLE `temp_tutor` DROP COLUMN `coordinates`;')
-        # cursor.execute('SELECT * FROM temp_sale_details; ')
+        try:
+          id = request.POST['id']
+          # cursor.execute('CREATE TEMPORARY TABLE `temp_tutor` AS SELECT * FROM `tutor`;')
+          # cursor.execute('ALTER TABLE `temp_tutor` DROP COLUMN `coordinates`;')
+          # cursor.execute('SELECT * FROM temp_sale_details; ')
 
-        # `id`, `name`, `email`, `phone`, `id_proof`, `education_cer`, `location`, `pic`, `status`, `video_link`, `bio`, `wallet`
-        sql = "SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE id = %s"
-        count = cursor.execute(sql, [id])
-        # row = cursor.fetchone()
-        # log.debug(dictfetchall(cursor))
-        if (count>0):
-          row = dictfetchAll(cursor)[0]
-          row.pop('coordinates') 
-          print(row)
-          return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
-        else:
-          return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
+          # `id`, `name`, `email`, `phone`, `id_proof`, `education_cer`, `location`, `pic`, `status`, `video_link`, `bio`, `wallet`
+          sql = "SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE id = %s"
+          count = cursor.execute(sql, [id])
+          # row = cursor.fetchone()
+          # log.debug(dictfetchall(cursor))
+          if (count>0):
+            row = dictfetchAll(cursor)[0]
+            row.pop('coordinates') 
+            print(row)
+            return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row}, status=status.HTTP_200_OK)   
+          else:
+            return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','data':None}, status=status.HTTP_200_OK)
+        except Exception as e:
+          print(e)
+          return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','error':e}, status=status.HTTP_200_OK)
+        finally:
+          cursor.close()
+        
 
 @api_view(['POST'])
 def tutor_validate(request):
@@ -43,7 +50,7 @@ def tutor_validate(request):
             row.pop('coordinates')
             return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':row,'valid':1}, status=status.HTTP_200_OK)   
          else:
-            return JsonResponse({'status': True, 'msg': 'Fetched not Successfully','valid':0}, status=status.HTTP_200_OK)
+            return JsonResponse({'status': False, 'msg': 'Fetched not Successfully','valid':0}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 def tutor_register(request):
