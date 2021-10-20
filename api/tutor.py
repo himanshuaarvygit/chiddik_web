@@ -143,115 +143,149 @@ def tutor_edit_details(request):
 @api_view(['POST'])
 def search_tutor(request):
   with connection.cursor() as cursor:
-    name = request.POST.get('name', '')
-    lat = request.POST.get('lat','')
-    lon = request.POST.get('lon','')
-    c_id = request.POST.get('c_id','')
-    s_id = request.POST.get('s_id','')
-    class_type = request.POST.get('class_type','')
-    min_price = request.POST.get('min_price','')
-    max_price = request.POST.get('max_price','')
-    page = request.POST.get('page','0')
+    try:
+      name = request.POST.get('name', '')
+      lat = request.POST.get('lat','')
+      lon = request.POST.get('lon','')
+      c_id = request.POST.get('c_id','')
+      s_id = request.POST.get('s_id','')
+      class_type = request.POST.get('class_type','')
+      min_price = request.POST.get('min_price','')
+      max_price = request.POST.get('max_price','')
+      page = request.POST.get('page',0)
+      sort = request.POST.get('sort', '')
 
-    tutorResult = []
-    pageCount = int(page)*20
-    
-    sql = ""
-    nameQuery = ""
-    classSubjectQuery = ""
-    classTypeQuery = ""
-    
-
-    if name=='' and lat =='' and lon =='' and class_type=='' and c_id=='' and s_id=='' and min_price =='' and max_price =='':
-      sql = f"SELECT DISTINCT(`id`) FROM `tutor` WHERE `status`='active' ORDER BY `id` DESC LIMIT {pageCount}, 20"
-    else:
-      if name!='':
-        nameQuery = f"AND `tutor`.`name` LIKE '%{name}%'"
+      tutorResult = []
+      pageCount = int(page)*20
       
-      if class_type=='group':
-        if min_price !='' and max_price !='':
-          classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
-        else:
-          classTypeQuery = f"AND (`services`.`type_group` = 'yes')"
-      elif class_type=='personal':
-        if min_price !='' and max_price !='':
-          classTypeQuery = f"AND (`services`.`type_personal` = 'yes' AND `services`.`personal_price` >= {min_price} AND `services`.`personal_price` <= {max_price})"
-        else:
-          classTypeQuery = f"AND (`services`.`type_personal` = 'yes')"
+      sql = ""
+      nameQuery = ""
+      classSubjectQuery = ""
+      classTypeQuery = ""
+      sortQuery = ""
+      
+
+      if name=='' and lat =='' and lon =='' and class_type=='' and c_id=='' and s_id=='' and min_price =='' and max_price =='':
+        sql = f"SELECT DISTINCT(`id`) FROM `tutor` WHERE `status`='active' ORDER BY `id` DESC LIMIT {pageCount}, 20"
       else:
-        if min_price !='' and max_price !='':
-          classTypeQuery = f"AND (`services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
-
-      if c_id !='':
-        if s_id !='':
-          classSubjectQuery = f"AND services`.`c_id` = {c_id} AND `services`.`s_id` = {s_id}"
+        if name!='':
+          nameQuery = f"AND `tutor`.`name` LIKE '%{name}%'"
+        
+        if class_type=='group':
+          if min_price !='' and max_price !='':
+            classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
+          else:
+            classTypeQuery = f"AND (`services`.`type_group` = 'yes')"
+        elif class_type=='personal':
+          if min_price !='' and max_price !='':
+            classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
+          else:
+            classTypeQuery = f"AND (`services`.`type_personal` = 'yes')"
+        elif class_type=='both':
+          if min_price !='' and max_price !='':
+            classTypeQuery = f"""AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})
+            AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})
+            """
+          else:
+            classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`type_group` = 'yes')"
         else:
-          classSubjectQuery = f"AND services`.`c_id` = {c_id}"
-      
-      
-      
-      if lat !='' and lon !='':
-        #all query with lat lon
-        sql = f"""
-          SELECT 
-              DISTINCT(tutor.id),
-              (6371 * ACOS(COS(RADIANS({lat})) * COS(RADIANS(Y(coordinates))) 
-              * COS(RADIANS(X(coordinates)) - RADIANS({lon})) + SIN(RADIANS({lat}))
-              * SIN(RADIANS(Y(coordinates))))) AS distance
-          FROM `tutor`
-          LEFT JOIN `services` ON `tutor`.`id` = `services`.`t_id`
-          WHERE MBRContains (
-              LineString (
-                  Point (
-                      {lon} + 15 / (111.320 * COS(RADIANS({lat}))),
-                      {lat} + 15 / 111.133
-                  ),
-                  Point (
-                      {lon} - 15 / (111.320 * COS(RADIANS({lat}))),
-                      {lat} - 15 / 111.133
-                  )
-              ),
-              coordinates
-              )
-              AND `services`.`status` = 'active'
-              {nameQuery}
-              {classSubjectQuery}
-              {classTypeQuery}
-          HAVING distance < 15
-          ORDER By distance
-          LIMIT {pageCount}, 20
-        """
-      else:
-        #all queries without lat lon
-        sql = f"""
-          SELECT 
-              DISTINCT(tutor.id)
-          FROM `tutor`
-          LEFT JOIN `services` ON `tutor`.`id` = `services`.`t_id`
-          WHERE 
-              `services`.`status` = 'active'
-              {nameQuery}
-              {classSubjectQuery}
-              {classTypeQuery}
-          ORDER BY `id` DESC
-          LIMIT {pageCount}, 20
-        """
+          if min_price !='' and max_price !='':
+            classTypeQuery = f"AND (`services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
 
-    print(sql)
-    cursor.execute(sql)
-    result = dictfetchAll(cursor)
-    for t in result:
-      id = t['id']
-      cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE `id`=%s", [id])
-      tRes = dictfetchAll(cursor)
-      if len(tRes) != 0:
-        data = tRes[0]
-        data.pop('coordinates')
-        tutorResult.append(data)
+        if c_id !='':
+          if s_id !='':
+            classSubjectQuery = f"AND `services`.`c_id` = {c_id} AND `services`.`s_id` = {s_id}"
+          else:
+            classSubjectQuery = f"AND `services`.`c_id` = {c_id}"
+        
+        if sort!='':
+          if sort=='a_z':
+            sortQuery = "ORDER By `tutor`.`name`"
+          elif sort=='z_a':
+            sortQuery = "ORDER By `tutor`.`name` DESC"
+          elif sort=='p_lh':
+            sortQuery = "ORDER By `tutor`.`name` DESC"
+          elif sort=='p_hl':
+            sortQuery = "ORDER By `tutor`.`name` DESC"
+        else:
+          if lat !='' and lon !='':
+            sortQuery = "ORDER By distance"
+          else:
+            sortQuery = "ORDER BY `id` DESC"
+        
+        if lat !='' and lon !='':
+          #all query with lat lon
+          sql = f"""
+            SELECT 
+                DISTINCT(tutor.id),
+                (6371 * ACOS(COS(RADIANS({lon})) * COS(RADIANS(Y(coordinates))) 
+                * COS(RADIANS(X(coordinates)) - RADIANS({lat})) + SIN(RADIANS({lon}))
+                * SIN(RADIANS(Y(coordinates))))) AS distance
+            FROM `tutor`
+            LEFT JOIN `services` ON `tutor`.`id` = `services`.`t_id`
+            WHERE MBRContains (
+                LineString (
+                    Point (
+                        {lat} + 15 / (111.320 * COS(RADIANS({lon}))),
+                        {lon} + 15 / 111.133
+                    ),
+                    Point (
+                        {lat} - 15 / (111.320 * COS(RADIANS({lon}))),
+                        {lon} - 15 / 111.133
+                    )
+                ),
+                coordinates
+                )
+                AND `services`.`status` = 'active'
+                {nameQuery}
+                {classSubjectQuery}
+                {classTypeQuery}
+            HAVING distance < 15
+            {sortQuery}
+            LIMIT {pageCount}, 20
+          """
+        else:
+          #all queries without lat lon
+          sql = f"""
+            SELECT 
+                DISTINCT(tutor.id)
+            FROM `tutor`
+            LEFT JOIN `services` ON `tutor`.`id` = `services`.`t_id`
+            WHERE 
+                `services`.`status` = 'active'
+                {nameQuery}
+                {classSubjectQuery}
+                {classTypeQuery}
+            {sortQuery}
+            LIMIT {pageCount}, 20
+          """
 
-    return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':tutorResult}, status=status.HTTP_200_OK)
+      print(sql)
+      cursor.execute(sql)
+      result = dictfetchAll(cursor)
+      for t in result:
+        id = t['id']
+        cursor.execute("SELECT *, ST_X(coordinates) as lat_tb, ST_Y(coordinates) as long_tb FROM `tutor` WHERE `id`=%s", [id])
+        tRes = dictfetchAll(cursor)
+        if len(tRes) != 0:
+          data = tRes[0]
+          data.pop('coordinates')
+          tutorResult.append(data)
+
+      return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data':tutorResult}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+      return JsonResponse({'status':False, 'msg': f'{e}'}, status=status.HTTP_200_OK)
+    finally:
+      cursor.close()
+    
+    
       
-      
+# @api_view(['POST'])
+# def get_popular_tutors(request):
+
+
+
 def check_valid_tutor(tutorId):
   with connection.cursor() as cursor:
     cursor.execute("SELECT * FROM `tutor` where id =%s", [tutorId])
