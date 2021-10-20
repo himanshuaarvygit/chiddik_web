@@ -178,19 +178,23 @@ def search_tutor(request):
             classTypeQuery = f"AND (`services`.`type_group` = 'yes')"
         elif class_type=='personal':
           if min_price !='' and max_price !='':
-            classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
+            classTypeQuery = f"AND (`services`.`type_personal` = 'yes' AND `services`.`personal_price` >= {min_price} AND `services`.`personal_price` <= {max_price})"
           else:
             classTypeQuery = f"AND (`services`.`type_personal` = 'yes')"
         elif class_type=='both':
           if min_price !='' and max_price !='':
-            classTypeQuery = f"""AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})
+            classTypeQuery = f"""AND (`services`.`type_personal` = 'yes' AND `services`.`personal_price` >= {min_price} AND `services`.`personal_price` <= {max_price})
             AND (`services`.`type_group` = 'yes' AND `services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})
             """
           else:
-            classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`type_group` = 'yes')"
+            classTypeQuery = f"AND (`services`.`type_group` = 'yes' AND `services`.`type_personal` = 'yes')"
         else:
+          print('here')
           if min_price !='' and max_price !='':
-            classTypeQuery = f"AND (`services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price})"
+            classTypeQuery = f"AND ((`services`.`group_price` >= {min_price} AND `services`.`group_price` <= {max_price}) OR (`services`.`personal_price` >= {min_price} AND `services`.`personal_price` <= {max_price}))"
+          else:
+            classTypeQuery = ""
+        
 
         if c_id !='':
           if s_id !='':
