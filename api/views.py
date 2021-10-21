@@ -18,7 +18,7 @@ from rest_framework.decorators import api_view
 def get_all_classes(request):
   with connection.cursor() as cursor:
     request.GET
-    cursor.execute("SELECT id, name, status FROM `class` where status = 'active'")
+    cursor.execute("SELECT * FROM `class` where status = 'active'")
     row = dictfetchAll(cursor)
   return JsonResponse({'status': True, 'msg': 'Fetched Successfully','data': row}, status=status.HTTP_200_OK)
 
